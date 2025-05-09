@@ -1,13 +1,32 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.themagicshop;
 
-/**
- *
- * @author GOSPOGA
- */
 public class Warehouse {
-    
+    private final int id;
+    private final String type;
+    private final String name;
+    private final int quantity;
+    private final int idSupply;
+
+    public Warehouse(int id, String type, String name, int quantity, int idSupply) {
+        this.id = id;
+        this.type = type;
+        this.name = name;
+        this.quantity = quantity;
+        this.idSupply = idSupply;
+    }
+
+    // Геттеры
+    public int getId() { return id; }
+    public String getType() { return type; }
+    public String getName() { return name; }
+    public int getQuantity() { return quantity; }
+    public int getIdSupply() { return idSupply; }
+
+    @Override
+    public String toString() {
+        return String.format(
+            "Warehouse [id=%d, type=%s, name=%s, quantity=%d, supplyId=%d]",
+            id, type, name, quantity, idSupply
+        );
+    }
 }

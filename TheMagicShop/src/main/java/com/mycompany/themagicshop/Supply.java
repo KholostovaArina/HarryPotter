@@ -1,13 +1,22 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.themagicshop;
 
-/**
- *
- * @author GOSPOGA
- */
+import java.time.LocalDate;
+
 public class Supply {
+    private final int id;
+    private final LocalDate date;
+    private boolean inWarehouse;
+
+    public Supply(int id, LocalDate date, boolean inWarehouse) {
+        this.id = id;
+        this.date = date;
+        this.inWarehouse = inWarehouse;
+    }
+
+    public int getId() { return id; }
+    public LocalDate getDate() { return date; }
+    public boolean getInWarehouse() { return inWarehouse; }
     
+    public void setInWarehouse(boolean inWarehouse) { this.inWarehouse = inWarehouse;}
+
 }

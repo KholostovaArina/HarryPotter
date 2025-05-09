@@ -28,7 +28,7 @@ public class SelectionWindow {
         JPanel contentPanel = new JPanel(new BorderLayout());
         contentPanel.add(createMainPanel(), BorderLayout.CENTER);
         contentPanel.add(createFooterPanel(), BorderLayout.SOUTH);
-        
+        setButtons();
         frame.add(contentPanel);       
         frame.setVisible(true);
     }
@@ -81,12 +81,23 @@ public class SelectionWindow {
         }
         return panel;
     }
+    
+    private void setButtons(){
+        sellButton.addActionListener(e -> OrderWindow.create());
+        createWandButton.addActionListener(e -> StickCreation.create());
+//        historyButton.addActionListener(e -> PurchaseHistoryWindow.create());
+//        readyWandsButton.addActionListener(e -> ReadyWandsWindow.create());
+//        viewShipmentsButton.addActionListener(e -> ShipmentsWindow.create());
+//        addShipmentButton.addActionListener(e -> AddShipmentWindow.create());
+//        updateShipmentButton.addActionListener(e -> ProcessShipmentWindow.create());
+//        clearAllButton.addActionListener(e -> ClearAllWindow.create());
+    }
 
-    public JButton getSellButton() { return sellButton; }
-    public JButton getHistoryButton() { return historyButton; }
-    public JButton getReadyWandsButton() { return readyWandsButton; }
-    public JButton getCreateWandButton() { return createWandButton; }
-    public JButton getViewShipmentsButton() { return viewShipmentsButton; }
-    public JButton getAddShipmentButton() { return addShipmentButton; }
-    public JButton getClearAllButton() { return clearAllButton; }
+//    public JButton getSellButton() { return sellButton; }
+//    public JButton getHistoryButton() { return historyButton; }
+//    public JButton getReadyWandsButton() { return readyWandsButton; }
+//    public JButton getCreateWandButton() { return createWandButton; }
+//    public JButton getViewShipmentsButton() { return viewShipmentsButton; }
+//    public JButton getAddShipmentButton() { return addShipmentButton; }
+//    public JButton getClearAllButton() { return clearAllButton; }
 }
