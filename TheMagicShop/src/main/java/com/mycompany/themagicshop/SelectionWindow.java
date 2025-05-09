@@ -2,6 +2,7 @@ package com.mycompany.themagicshop;
 
 import javax.swing.*;
 import java.awt.*;
+import java.sql.*;
 
 public class SelectionWindow {
     private static final Color BACKGROUND_CASH_REGISTER = Color.WHITE;
@@ -87,12 +88,35 @@ public class SelectionWindow {
         createWandButton.addActionListener(e -> StickCreation.create());
         historyButton.addActionListener(e -> PurchaseHistoryWindow.create());
         readyWandsButton.addActionListener(e -> ReadyWandsWindow.create());
-//        viewShipmentsButton.addActionListener(e -> ShipmentsWindow.create());
-//        addShipmentButton.addActionListener(e -> AddShipmentWindow.create());
-//        updateShipmentButton.addActionListener(e -> ProcessShipmentWindow.create());
-//        clearAllButton.addActionListener(e -> ClearAllWindow.create());
+        viewShipmentsButton.addActionListener(e -> SupplyWindow.create());
+        addShipmentButton.addActionListener(e -> AddSupplyWindow.create());
+        updateShipmentButton.addActionListener(e -> ProcessSupplyWindow.create());
+        clearAllButton.addActionListener(e -> clearAllData());
     }
 
+    private void clearAllData() {
+         int choice = JOptionPane.showConfirmDialog(null,
+                "Вы уверены, что хотите удалить ВСЕ данные? Это действие нельзя отменить!",
+                "Очистка базы данных",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.WARNING_MESSAGE);
+
+        if (choice == JOptionPane.YES_OPTION) {
+            try (Connection conn = PostgresConnecter.getConnection()) {
+                conn.createStatement().executeUpdate("DELETE FROM magic_shop.magic_wand");
+                conn.createStatement().executeUpdate("DELETE FROM magic_shop.supply");
+                conn.createStatement().executeUpdate("DELETE FROM magic_shop.warehouse");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            JOptionPane.showMessageDialog(null,
+                    "Все данные успешно удалены!",
+                    "Успех",
+                    JOptionPane.INFORMATION_MESSAGE);
+        }
+
+    }
+            
 //    public JButton getSellButton() { return sellButton; }
 //    public JButton getHistoryButton() { return historyButton; }
 //    public JButton getReadyWandsButton() { return readyWandsButton; }

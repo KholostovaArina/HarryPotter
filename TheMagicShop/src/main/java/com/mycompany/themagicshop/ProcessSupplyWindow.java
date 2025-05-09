@@ -1,0 +1,94 @@
+package com.mycompany.themagicshop;
+
+import javax.swing.*;
+//import javax.swing.event.ListSelectionEvent;
+//import javax.swing.event.ListSelectionListener;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.List;
+
+public class ProcessSupplyWindow {
+    public static void create() {
+        JFrame frame = new JFrame("Обработка поставок");
+        frame.setSize(600, 400);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLayout(new BorderLayout());
+
+        // Получаем все поставки
+        List<Supply> supplies = Storage.getAllSupplies();
+        DefaultListModel<Supply> listModel = new DefaultListModel<>();
+        supplies.forEach(listModel::addElement);
+
+        // Создаем список с рендерером
+        JList<Supply> list = new JList<>(listModel);
+        list.setCellRenderer(new SupplyListRenderer());
+        
+        // Добавляем обработчик двойного клика
+        list.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent evt) {
+                if (evt.getClickCount() == 2) {
+                    int index = list.locationToIndex(evt.getPoint());
+                    Supply selected = listModel.get(index);
+                    processSupply(selected, frame, listModel);
+                }
+            }
+        });
+
+        frame.add(new JScrollPane(list), BorderLayout.CENTER);
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+
+    private static void processSupply(Supply supply, JFrame parent, DefaultListModel<Supply> model) {
+        if (supply.getInWarehouse()) {
+            JOptionPane.showMessageDialog(parent,
+                "Эта поставка уже обработана!",
+                "Информация",
+                JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
+        int confirm = JOptionPane.showConfirmDialog(parent,
+            "Перенести поставку #" + supply.getId() + " на склад?",
+            "Подтверждение",
+            JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                // Обновляем статус поставки
+                supply.setInWarehouse(true);
+                Storage.updateSupply(supply);
+                
+                // Обновляем список
+                model.setElementAt(supply, model.indexOf(supply));
+                
+                JOptionPane.showMessageDialog(parent,
+                    "Поставка успешно перенесена на склад!",
+                    "Успех",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(parent,
+                    "Ошибка: " + ex.getMessage(),
+                    "Ошибка",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    // Кастомный рендерер для отображения статуса
+    private static class SupplyListRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                      boolean isSelected, boolean cellHasFocus) {
+            Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+            Supply supply = (Supply) value;
+            String status = supply.getInWarehouse() ? "[НА СКЛАДЕ] " : "[НЕ ОБРАБОТАНА] ";
+            setText(status + "Поставка #" + supply.getId() + " от " + supply.getDate());
+            setForeground(supply.getInWarehouse() ? Color.GRAY : Color.BLACK);
+            return c;
+        }
+    }
+}
