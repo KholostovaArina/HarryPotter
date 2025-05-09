@@ -86,7 +86,7 @@ public class SelectionWindow {
         sellButton.addActionListener(e -> OrderWindow.create());
         createWandButton.addActionListener(e -> StickCreation.create());
         historyButton.addActionListener(e -> PurchaseHistoryWindow.create());
-//        readyWandsButton.addActionListener(e -> ReadyWandsWindow.create());
+        readyWandsButton.addActionListener(e -> ReadyWandsWindow.create());
 //        viewShipmentsButton.addActionListener(e -> ShipmentsWindow.create());
 //        addShipmentButton.addActionListener(e -> AddShipmentWindow.create());
 //        updateShipmentButton.addActionListener(e -> ProcessShipmentWindow.create());
