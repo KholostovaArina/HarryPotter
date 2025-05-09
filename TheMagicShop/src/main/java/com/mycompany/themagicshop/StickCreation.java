@@ -66,6 +66,7 @@ public class StickCreation {
                 conn.commit();
 
                 JOptionPane.showMessageDialog(frame, "Палочка создана: " + selectedBody + "+" + selectedCore, "Успех", JOptionPane.INFORMATION_MESSAGE);
+                frame.dispose();
 
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(frame, "Ошибка: " + ex.getMessage(), "Ошибка", JOptionPane.ERROR_MESSAGE);

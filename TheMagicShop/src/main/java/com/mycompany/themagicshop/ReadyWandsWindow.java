@@ -8,6 +8,6 @@ package com.mycompany.themagicshop;
  *
  * @author GOSPOGA
  */
-public class PurchaseHistoricalWindow {
+public class ReadyWandsWindow {
     
 }
