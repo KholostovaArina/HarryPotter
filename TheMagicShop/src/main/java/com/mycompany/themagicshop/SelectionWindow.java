@@ -104,8 +104,8 @@ public class SelectionWindow {
         if (choice == JOptionPane.YES_OPTION) {
             try (Connection conn = PostgresConnecter.getConnection()) {
                 conn.createStatement().executeUpdate("DELETE FROM magic_shop.magic_wand");
-                conn.createStatement().executeUpdate("DELETE FROM magic_shop.supply");
                 conn.createStatement().executeUpdate("DELETE FROM magic_shop.warehouse");
+                conn.createStatement().executeUpdate("DELETE FROM magic_shop.supply");
             } catch (SQLException e) {
                 e.printStackTrace();
             }
