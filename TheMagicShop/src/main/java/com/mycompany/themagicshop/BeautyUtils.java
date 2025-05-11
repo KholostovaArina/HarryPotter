@@ -39,13 +39,18 @@ public class BeautyUtils {
     private static Image skyImage;
     private static Image welcomeImage;
     
+    private static Image createImage;
+    private static Image buyImage;
+    
     static {
         try {
-           //warehouseImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/склад.jpg"));
-           // wandImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/палочка.jpg"));
+            warehouseImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/склад.PNG"));
+            wandImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/палочка.PNG"));
             skyImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/небо.jpg"));
+            createImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/фото1.jpg"));
+            buyImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/фото2.jpg"));
             welcomeImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/вход.png"));
-          //  boxImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/поставка.jpg"));
+            boxImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/поставка.PNG"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -88,6 +93,14 @@ public class BeautyUtils {
     
     public static Image getWelcomeImage() {
         return welcomeImage;
+    }
+    
+    public static Image getBuyImage() {
+        return buyImage;
+    }
+    
+    public static Image getCreateImage() {
+        return createImage;
     }
     
     public static Color getMyYellow(){

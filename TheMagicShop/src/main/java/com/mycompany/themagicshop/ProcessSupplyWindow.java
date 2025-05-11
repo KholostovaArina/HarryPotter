@@ -21,7 +21,7 @@ public class ProcessSupplyWindow {
         // Создаем список с рендерером
         JList<Supply> list = new JList<>(listModel);
         list.setCellRenderer(new SupplyListRenderer());
-        
+
         // Добавляем обработчик двойного клика
         list.addMouseListener(new MouseAdapter() {
             @Override
@@ -40,54 +40,78 @@ public class ProcessSupplyWindow {
         frame.setVisible(true);
     }
 
-  
     private static void processSupply(Supply supply, JFrame parent, DefaultListModel<Supply> model) {
-    if (supply.getInWarehouse()) {
-        JOptionPane.showMessageDialog(parent,
-            "Эта поставка уже обработана!",
-            "Информация",
-            JOptionPane.INFORMATION_MESSAGE);
-        return;
-    }
-
-    int confirm = JOptionPane.showConfirmDialog(parent,
-        "Перенести поставку #" + supply.getId() + " на склад?",
-        "Подтверждение",
-        JOptionPane.YES_NO_OPTION);
-
-    if (confirm == JOptionPane.YES_OPTION) {
-        try {
-            // Переносим компоненты на склад
-            Storage.moveSupplyToWarehouse(supply.getId());
-            
-            // Обновляем статус поставки
-            supply.setInWarehouse(true);
-            Storage.updateSupply(supply);
-            
-            // Обновляем список
-            model.setElementAt(supply, model.indexOf(supply));
-            
+        if (supply.getInWarehouse()) {
             JOptionPane.showMessageDialog(parent,
-                "Поставка успешно перенесена на склад!",
-                "Успех",
+                "Эта поставка уже обработана!",
+                "Информация",
                 JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
 
-        } catch (Exception ex) {
-            ex.printStackTrace(); // <-- добавь
-            JOptionPane.showMessageDialog(parent,
-                "Ошибка обработки поставки: " + ex.getMessage(),
-                "Ошибка",
-                JOptionPane.ERROR_MESSAGE);
+        int confirm = JOptionPane.showConfirmDialog(parent,
+            "Перенести поставку #" + supply.getId() + " на склад?",
+            "Подтверждение",
+            JOptionPane.YES_NO_OPTION);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                // Получаем компоненты из временного хранилища
+                List<Warehouse> components = AddSupplyWindow.AddSupplyStorage.getComponents(supply.getId());
+                System.out.println("Компоненты для добавления на склад: " + components);
+
+                if (components.isEmpty()) {
+                    throw new RuntimeException("Нет компонентов для этой поставки.");
+                }
+
+                // Переносим в warehouse
+                for (Warehouse component : components) {
+                    Storage.addToWarehouse(
+                        component.getType(),
+                        component.getName(),
+                        component.getQuantity(),
+                        component.getIdSupply()
+                    );
+                }
+
+                // Обновляем статус поставки
+                supply.setInWarehouse(true);
+                Storage.updateSupply(supply);
+                model.setElementAt(supply, model.indexOf(supply));
+
+                // Очищаем временное хранилище только после успеха
+                AddSupplyWindow.AddSupplyStorage.clearComponents(supply.getId());
+
+                // Закрываем и сбрасываем окно AddSupplyWindow, если оно было открыто
+                if (AddSupplyWindow.isOpen()) {
+                    AddSupplyWindow window = AddSupplyWindow.getInstance();
+                    window.closeAndReset();
+                }
+
+                // Обновляем интерфейс SupplyWindow
+                SwingUtilities.invokeLater(() -> {
+                    SupplyWindow.create();
+                });
+
+                JOptionPane.showMessageDialog(parent,
+                    "Поставка успешно перенесена на склад!",
+                    "Успех",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(parent,
+                    "Ошибка обработки поставки: " + ex.getMessage(),
+                    "Ошибка",
+                    JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
-}
-   
 
-    // Кастомный рендерер для отображения статуса
     private static class SupplyListRenderer extends DefaultListCellRenderer {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                      boolean isSelected, boolean cellHasFocus) {
+                                                    boolean isSelected, boolean cellHasFocus) {
             Component c = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             Supply supply = (Supply) value;
             String status = supply.getInWarehouse() ? "[НА СКЛАДЕ] " : "[НЕ ОБРАБОТАНА] ";

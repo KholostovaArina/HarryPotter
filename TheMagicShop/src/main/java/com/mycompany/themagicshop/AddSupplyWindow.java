@@ -8,25 +8,43 @@ import java.util.List;
 
 public class AddSupplyWindow {
     private int currentSupplyId = -1;
-    private List<String> componentsList = new ArrayList<>();
+    private List<Warehouse> tempComponents = new ArrayList<>();
     private JFrame frame;
     private JTextField nameField;
     private JSpinner quantitySpinner;
     private JTextField dateField;
     private JComboBox<String> typeCombo;
 
+    // Для отслеживания открытого окна
+    private static boolean isOpen = false;
+    private static AddSupplyWindow instance;
+
     public static void create() {
+        if (isOpen) return; // Не открываем второе окно
         new AddSupplyWindow().initializeUI();
     }
 
+    public static boolean isOpen() {
+        return isOpen;
+    }
+
+    public static AddSupplyWindow getInstance() {
+        return instance;
+    }
+
     private void initializeUI() {
+        isOpen = true;
+        instance = this;
+
         frame = new JFrame("Новая поставка");
         frame.setSize(450, 300);
         frame.setLayout(new BorderLayout(10, 10));
         frame.setLocationRelativeTo(null);
 
         // Панель ввода данных
+        JPanel panel = BeautyUtils.createPanelWithPhoto(BeautyUtils.getBuyImage());
         JPanel inputPanel = new JPanel(new GridLayout(4, 2, 10, 10));
+        inputPanel.setOpaque(false);
         typeCombo = new JComboBox<>(new String[]{"корпус", "сердцевина"});
         nameField = new JTextField();
         quantitySpinner = new JSpinner(new SpinnerNumberModel(1, 1, 1000, 1));
@@ -46,107 +64,114 @@ public class AddSupplyWindow {
         JButton addButton = new JButton("Добавить компонент");
         JButton saveButton = new JButton("Поставка закончена");
 
-        // Обработчики событий
         addButton.addActionListener(e -> addComponent());
         saveButton.addActionListener(e -> saveSupply());
 
         buttonPanel.add(addButton);
         buttonPanel.add(saveButton);
+        buttonPanel.setOpaque(false);
 
-        frame.add(inputPanel, BorderLayout.CENTER);
-        frame.add(buttonPanel, BorderLayout.SOUTH);
+        panel.add(inputPanel, BorderLayout.CENTER);
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+        frame.add(panel);
+
         BeautyUtils.setFontForAllComponents(frame);
         frame.setVisible(true);
     }
 
-    private List<Warehouse> tempComponents = new ArrayList<>();
-
-private void addComponent() {
-    String type = (String) typeCombo.getSelectedItem();
-    String name = nameField.getText().trim();
-    int quantity = (Integer) quantitySpinner.getValue();
-
-    if (name.isEmpty()) {
-        showError("Введите название компонента!");
-        return;
-    }
-
-    try {
-        // Создаем поставку при первом добавлении компонента
-        if (currentSupplyId == -1) {
-            Supply supply = new Supply(0, LocalDate.parse(dateField.getText()), false);
-            currentSupplyId = Storage.addSupplyAndGetId(supply);
-        }
-
-        // Сохраняем компонент во временный список
-        tempComponents.add(new Warehouse(
-                0, // id будет присвоен БД
-                type,
-                name,
-                quantity,
-                currentSupplyId
-        ));
-
-        // Обновляем отображение списка
-        componentsList.add(String.format("%s: %s (%d шт)", type, name, quantity));
-
-        // Очищаем поля
+    private void addComponent() {
+        String type = (String) typeCombo.getSelectedItem();
+        String name = nameField.getText().trim();
         nameField.setText("");
-        quantitySpinner.setValue(1);
-    } catch (Exception ex) {
-        showError("Ошибка добавления компонента: " + ex.getMessage());
-        ex.printStackTrace();
-    }
-}
+        int quantity = (Integer) quantitySpinner.getValue();
 
-private void saveSupply() {
-    if (componentsList.isEmpty()) {
-        showError("Добавьте хотя бы один компонент!");
-        return;
-    }
-
-    try {
-        // Сохраняем компоненты в warehouse
-        for (Warehouse component : tempComponents) {
-            Storage.addToWarehouse(component.getType(), component.getName(),
-                                   component.getQuantity(), component.getIdSupply());
+        if (name.isEmpty()) {
+            showError("Введите название компонента!");
+            return;
         }
 
-        // Обновляем статус поставки
-        Supply supply = new Supply(
-            currentSupplyId,
-            LocalDate.parse(dateField.getText()),
-            true
-        );
-        Storage.updateSupply(supply);
+        try {
+            // Создаем поставку при первом добавлении компонента
+            if (currentSupplyId == -1) {
+                Supply supply = new Supply(0, LocalDate.parse(dateField.getText()), false);
+                currentSupplyId = Storage.addSupplyAndGetId(supply);
+            }
 
-        // Показываем результат
-        showSuccess();
-    } catch (Exception ex) {
-        showError("Ошибка сохранения: " + ex.getMessage());
-    } finally {
+            // Сохраняем компонент во временный список
+            tempComponents.add(new Warehouse(
+                    0,
+                    type,
+                    name,
+                    quantity,
+                    currentSupplyId
+            ));
+
+            JOptionPane.showMessageDialog(frame, "Компонент добавлен!", "Информация", JOptionPane.INFORMATION_MESSAGE);
+        } catch (HeadlessException ex) {
+            showError("Ошибка добавления компонента: " + ex.getMessage());
+        }
+    }
+
+    private void saveSupply() {
+        if (tempComponents.isEmpty()) {
+            showError("Добавьте хотя бы один компонент!");
+            return;
+        }
+
+        try {
+            // Сохраняем компоненты во временное хранилище
+            AddSupplyStorage.addComponents(currentSupplyId, tempComponents);
+            showSuccess();
+        } catch (Exception ex) {
+            showError("Ошибка сохранения поставки: " + ex.getMessage());
+        }
+    }
+
+    private void showError(String message) {
+        JOptionPane.showMessageDialog(frame, message, "Ошибка", JOptionPane.ERROR_MESSAGE);
+    }
+
+    private void showSuccess() {
+        StringBuilder sb = new StringBuilder("Поставка #")
+                .append(currentSupplyId)
+                .append("\nСостав:\n");
+        for (Warehouse component : tempComponents) {
+            sb.append("• ")
+              .append(component.getType())
+              .append(": ")
+              .append(component.getName())
+              .append(" (")
+              .append(component.getQuantity())
+              .append(" шт)\n");
+        }
+        JOptionPane.showMessageDialog(frame, sb.toString(), "Успех", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void closeAndReset() {
         resetState();
     }
-}
 
+    private void resetState() {
+        isOpen = false;
+        currentSupplyId = -1;
+        tempComponents.clear();
+        frame.dispose();
+    }
 
-private void showError(String message) {
-    JOptionPane.showMessageDialog(frame, message, "Ошибка", JOptionPane.ERROR_MESSAGE);
-}
+    // Временное хранилище для компонентов поставок
+    public static class AddSupplyStorage {
+        private static final java.util.Map<Integer, List<Warehouse>> supplyComponents = new java.util.HashMap<>();
 
-private void showSuccess() {
-    StringBuilder sb = new StringBuilder("Поставка #")
-        .append(currentSupplyId)
-        .append("\nСостав:\n");
-    
-    componentsList.forEach(item -> sb.append("• ").append(item).append("\n"));
-    
-    JOptionPane.showMessageDialog(frame, sb.toString(), "Успех", JOptionPane.INFORMATION_MESSAGE);
-}
+        public static void addComponents(int supplyId, List<Warehouse> components) {
+            supplyComponents.put(supplyId, components);
+        }
 
-private void resetState() {
-    currentSupplyId = -1;
-    componentsList.clear();
-    frame.dispose();
-}
+        public static List<Warehouse> getComponents(int supplyId) {
+            return supplyComponents.getOrDefault(supplyId, new ArrayList<>());
+        }
+
+        public static void clearComponents(int supplyId) {
+            supplyComponents.remove(supplyId);
+        }
+    }
 }

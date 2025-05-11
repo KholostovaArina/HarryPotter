@@ -40,18 +40,18 @@ public class SelectionWindow {
     }
 
     private JPanel createCashRegisterPanel() {
-        return createSectionPanel("Прилавок", 
-            sellButton, historyButton);
+        return createSectionPanel("Прилавок",
+                new JComponent[]{sellButton, historyButton, new JLabel(), new JLabel(), new JLabel(), new JLabel()}, BeautyUtils.getWandImage());
     }
 
     private JPanel createWarehousePanel() {
         return createSectionPanel("Склад",
-            readyWandsButton, createWandButton);
+                new JComponent[]{readyWandsButton, createWandButton, new JLabel(), new JLabel(), new JLabel(), new JLabel()}, BeautyUtils.getWarehouseImage());
     }
 
     private JPanel createShipmentPanel() {
         return createSectionPanel("Поставки",
-            viewShipmentsButton, addShipmentButton, updateShipmentButton);
+                new JComponent[]{viewShipmentsButton, addShipmentButton, updateShipmentButton}, BeautyUtils.getBoxImage());
     }
 
     private JPanel createFooterPanel() {
@@ -63,19 +63,21 @@ public class SelectionWindow {
         return panel;
     }
 
-    private JPanel createSectionPanel(String title, JComponent... components) {
+    private JPanel createSectionPanel(String title, JComponent[] components, Image image) {
         JPanel panel = new JPanel();
         panel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setOpaque(false);
-        
+
+        // Заголовок
         JLabel label = new JLabel(title);
         label.setForeground(BeautyUtils.getMyYellow());
         label.setFont(BeautyUtils.getBigFont());
         label.setAlignmentX(Component.CENTER_ALIGNMENT);
         panel.add(label);
         panel.add(Box.createVerticalStrut(20));
-        
+
+        // Кнопки
         for (JComponent component : components) {
             component.setAlignmentX(Component.CENTER_ALIGNMENT);
             component.setBackground(BeautyUtils.getMyPink());
@@ -83,10 +85,20 @@ public class SelectionWindow {
             panel.add(component);
             panel.add(Box.createVerticalStrut(10));
         }
+
+        // Добавляем изображение под кнопками
+        if (image != null) {
+            Image scaledImage = image.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+            JLabel imageLabel = new JLabel(new ImageIcon(scaledImage));
+            imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+            panel.add(Box.createVerticalStrut(15)); // отступ сверху
+            panel.add(imageLabel);
+        }
+
         return panel;
     }
-    
-    private void setButtons(){
+
+    private void setButtons() {
         sellButton.addActionListener(e -> OrderWindow.create());
         createWandButton.addActionListener(e -> StickCreation.create());
         historyButton.addActionListener(e -> PurchaseHistoryWindow.create());
@@ -98,7 +110,7 @@ public class SelectionWindow {
     }
 
     private void clearAllData() {
-         int choice = JOptionPane.showConfirmDialog(null,
+        int choice = JOptionPane.showConfirmDialog(null,
                 "Вы уверены, что хотите удалить ВСЕ данные? Это действие нельзя отменить!",
                 "Очистка базы данных",
                 JOptionPane.YES_NO_OPTION,
@@ -119,12 +131,4 @@ public class SelectionWindow {
         }
 
     }
-            
-//    public JButton getSellButton() { return sellButton; }
-//    public JButton getHistoryButton() { return historyButton; }
-//    public JButton getReadyWandsButton() { return readyWandsButton; }
-//    public JButton getCreateWandButton() { return createWandButton; }
-//    public JButton getViewShipmentsButton() { return viewShipmentsButton; }
-//    public JButton getAddShipmentButton() { return addShipmentButton; }
-//    public JButton getClearAllButton() { return clearAllButton; }
 }

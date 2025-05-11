@@ -19,11 +19,14 @@ public class OrderWindow {
                 .map(w -> w.getCore() + "+" + w.getCorpus())
                 .toArray(String[]::new);
 
+        // Создаем основную панель с фоновым изображением
+        JPanel mainPanel = BeautyUtils.createPanelWithPhoto(BeautyUtils.getBuyImage());
+        mainPanel.setLayout(null);
+
         // Создаем GUI
         JFrame frame = new JFrame("Оформление заказа");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(550, 300);
-        frame.setLayout(null);
         frame.setLocationRelativeTo(null);
 
         // Выпадающий список с палочками
@@ -40,11 +43,9 @@ public class OrderWindow {
 
         // Кнопка оформления заказа
         JButton orderButton = new JButton("Оформить заказ");
-        
         orderButton.setBounds(150, 200, 200, 40);
         
         // Обработчик кнопки
-         // Обработчик кнопки
         orderButton.addActionListener(e -> {
             int index = wandComboBox.getSelectedIndex();
             if (index == -1) {
@@ -63,11 +64,15 @@ public class OrderWindow {
             frame.dispose();
         });
 
-        frame.add(wandLabel);
-        frame.add(wandComboBox);
-        frame.add(nameLabel);
-        frame.add(nameField);
-        frame.add(orderButton);
+        // Добавляем компоненты на панель с фоном
+        mainPanel.add(wandLabel);
+        mainPanel.add(wandComboBox);
+        mainPanel.add(nameLabel);
+        mainPanel.add(nameField);
+        mainPanel.add(orderButton);
+
+        // Добавляем панель во фрейм
+        frame.add(mainPanel);
         BeautyUtils.setFontForAllComponents(frame);
         frame.setVisible(true);
     }

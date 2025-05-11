@@ -10,13 +10,11 @@ public class Storage {
     public static int addSupplyAndGetId(Supply supply) {
         String sql = "INSERT INTO magic_shop.supply (data, in_warehouse) VALUES (?, ?) RETURNING id";
         try (Connection conn = PostgresConnecter.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
             pstmt.setDate(1, Date.valueOf(supply.getDate()));
-            pstmt.setBoolean(2, supply.getInWarehouse());
-
+            pstmt.setString(2, supply.getInWarehouse() ? "да" : "нет");
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt("id"); // Используем имя столбца
+                    return rs.getInt("id");
                 }
             }
         } catch (SQLException e) {
@@ -25,6 +23,46 @@ public class Storage {
         return -1;
     }
 
+    public static List<Supply> getAllSupplies() {
+        List<Supply> supplies = new ArrayList<>();
+        String sql = "SELECT * FROM magic_shop.supply";
+        try (Connection conn = PostgresConnecter.getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                LocalDate supplyDate = rs.getDate("data").toLocalDate();
+                boolean inWarehouse = rs.getString("in_warehouse").equals("да");
+                Supply supply = new Supply(rs.getInt("id"), supplyDate, inWarehouse);
+                supplies.add(supply);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return supplies;
+    }
+
+    public static void updateSupply(Supply supply) {
+        String sql = "UPDATE magic_shop.supply SET in_warehouse = 'да' WHERE id = ?";
+        try (Connection conn = PostgresConnecter.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, supply.getId());
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка обновления поставки: " + e.getMessage());
+        }
+    }
+
+    public static void addToWarehouse(String type, String name, int quantity, int supplyId) {
+        String sql = "INSERT INTO magic_shop.warehouse (type, name, quantity, id_supply) VALUES (?, ?, ?, ?)";
+        try (Connection conn = PostgresConnecter.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, type);
+            pstmt.setString(2, name);
+            pstmt.setInt(3, quantity);
+            pstmt.setInt(4, supplyId);
+            pstmt.executeUpdate();
+        } catch (SQLException ex) {
+            throw new RuntimeException("Ошибка добавления в склад: " + ex.getMessage());
+        }
+    }
+
+    
     public static List<MagicWand> getAllWands() {
         List<MagicWand> wands = new ArrayList<>();
         String sql = "SELECT * FROM magic_shop.magic_wand";
@@ -61,30 +99,7 @@ public class Storage {
         return wands;
     }
 
-    public static List<Supply> getAllSupplies() {
-        List<Supply> supplies = new ArrayList<>();
-        String sql = "SELECT * FROM magic_shop.supply";
-
-        try (Connection conn = PostgresConnecter.getConnection(); Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
-
-            while (rs.next()) {
-                LocalDate supplyDate = rs.getDate("data").toLocalDate();
-                boolean inWarehouse = (rs.getString("in_warehouse")).equals("да");
-                Supply supply = new Supply(
-                        rs.getInt("id"),
-                        supplyDate,
-                        inWarehouse
-                );
-                supplies.add(supply);
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return supplies;
-    }
-
+    
     public static List<Warehouse> getWarehouse() {
         List<Warehouse> warehouseItems = new ArrayList<>();
         String sql = "SELECT * FROM magic_shop.warehouse";
@@ -245,34 +260,6 @@ public class Storage {
 
     }
 
-    public static void addToWarehouse(String type, String name, int quantity, int supplyId) {
-        String sql = "INSERT INTO magic_shop.warehouse (type, name, quantity, id_supply) VALUES (?, ?, ?, ?)";
-        try (Connection conn = PostgresConnecter.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
-
-            pstmt.setString(1, type);
-            pstmt.setString(2, name);
-            pstmt.setInt(3, quantity);
-            pstmt.setInt(4, supplyId);
-
-            pstmt.executeUpdate();
-        } catch (SQLException e) {
-            throw new RuntimeException("Ошибка при добавлении компонента: " + e.getMessage());
-        }
-    }
-
-    public static void updateSupply(Supply supply) {
-    String sql = "UPDATE magic_shop.supply SET in_warehouse = ? WHERE id = ?";
-    try (Connection conn = PostgresConnecter.getConnection(); 
-         PreparedStatement pstmt = conn.prepareStatement(sql)) {
-        // Отправляем строку "да"/"нет" вместо boolean
-        pstmt.setString(1, supply.getInWarehouse() ? "да" : "нет");
-        pstmt.setInt(2, supply.getId());
-        pstmt.executeUpdate();
-    } catch (SQLException e) {
-        throw new RuntimeException("Ошибка обновления поставки: " + e.getMessage());
-    }
-}
-
 
     public static void addSupplyComponent(int supplyId, String type, String name, int quantity) {
     try (Connection conn = PostgresConnecter.getConnection()) {
@@ -316,6 +303,4 @@ public static void moveSupplyToWarehouse(int supplyId) {
         throw new RuntimeException("Ошибка при переносе поставки на склад: " + ex.getMessage(), ex);
     }
 }
-
-
 }
