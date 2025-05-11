@@ -71,9 +71,9 @@ public class AddSupplyWindow {
         buttonPanel.add(saveButton);
         buttonPanel.setOpaque(false);
 
-        panel.add(inputPanel, BorderLayout.CENTER);
-        panel.add(buttonPanel, BorderLayout.SOUTH);
-        frame.add(panel);
+        frame.add(inputPanel, BorderLayout.CENTER);
+        frame.add(buttonPanel, BorderLayout.SOUTH);
+        //frame.add(panel);
 
         BeautyUtils.setFontForAllComponents(frame);
         frame.setVisible(true);
