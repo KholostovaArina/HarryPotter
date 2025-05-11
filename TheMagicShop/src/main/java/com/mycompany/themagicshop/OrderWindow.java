@@ -22,7 +22,7 @@ public class OrderWindow {
         // Создаем GUI
         JFrame frame = new JFrame("Оформление заказа");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(450, 300);
+        frame.setSize(550, 300);
         frame.setLayout(null);
         frame.setLocationRelativeTo(null);
 
@@ -30,18 +30,18 @@ public class OrderWindow {
         JLabel wandLabel = new JLabel("Выберите палочку:");
         wandLabel.setBounds(10, 40, 150, 25);
         JComboBox<String> wandComboBox = new JComboBox<>(wandNames);
-        wandComboBox.setBounds(170, 40, 250, 25);
+        wandComboBox.setBounds(270, 40, 250, 25);
 
         // Поле для имени покупателя
         JLabel nameLabel = new JLabel("Введите имя покупателя:");
-        nameLabel.setBounds(10, 100, 150, 25);
+        nameLabel.setBounds(10, 100, 200, 25);
         JTextField nameField = new JTextField();
-        nameField.setBounds(170, 100, 250, 25);
+        nameField.setBounds(270, 100, 250, 25);
 
         // Кнопка оформления заказа
         JButton orderButton = new JButton("Оформить заказ");
         
-        orderButton.setBounds(100, 200, 200, 40);
+        orderButton.setBounds(150, 200, 200, 40);
         
         // Обработчик кнопки
          // Обработчик кнопки
@@ -68,6 +68,7 @@ public class OrderWindow {
         frame.add(nameLabel);
         frame.add(nameField);
         frame.add(orderButton);
+        BeautyUtils.setFontForAllComponents(frame);
         frame.setVisible(true);
     }
 }

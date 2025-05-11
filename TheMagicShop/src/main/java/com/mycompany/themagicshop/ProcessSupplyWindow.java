@@ -1,8 +1,6 @@
 package com.mycompany.themagicshop;
 
 import javax.swing.*;
-//import javax.swing.event.ListSelectionEvent;
-//import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -37,46 +35,53 @@ public class ProcessSupplyWindow {
         });
 
         frame.add(new JScrollPane(list), BorderLayout.CENTER);
+        BeautyUtils.setFontForAllComponents(frame);
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
     }
 
+  
     private static void processSupply(Supply supply, JFrame parent, DefaultListModel<Supply> model) {
-        if (supply.getInWarehouse()) {
+    if (supply.getInWarehouse()) {
+        JOptionPane.showMessageDialog(parent,
+            "Эта поставка уже обработана!",
+            "Информация",
+            JOptionPane.INFORMATION_MESSAGE);
+        return;
+    }
+
+    int confirm = JOptionPane.showConfirmDialog(parent,
+        "Перенести поставку #" + supply.getId() + " на склад?",
+        "Подтверждение",
+        JOptionPane.YES_NO_OPTION);
+
+    if (confirm == JOptionPane.YES_OPTION) {
+        try {
+            // Переносим компоненты на склад
+            Storage.moveSupplyToWarehouse(supply.getId());
+            
+            // Обновляем статус поставки
+            supply.setInWarehouse(true);
+            Storage.updateSupply(supply);
+            
+            // Обновляем список
+            model.setElementAt(supply, model.indexOf(supply));
+            
             JOptionPane.showMessageDialog(parent,
-                "Эта поставка уже обработана!",
-                "Информация",
+                "Поставка успешно перенесена на склад!",
+                "Успех",
                 JOptionPane.INFORMATION_MESSAGE);
-            return;
-        }
 
-        int confirm = JOptionPane.showConfirmDialog(parent,
-            "Перенести поставку #" + supply.getId() + " на склад?",
-            "Подтверждение",
-            JOptionPane.YES_NO_OPTION);
-
-        if (confirm == JOptionPane.YES_OPTION) {
-            try {
-                // Обновляем статус поставки
-                supply.setInWarehouse(true);
-                Storage.updateSupply(supply);
-                
-                // Обновляем список
-                model.setElementAt(supply, model.indexOf(supply));
-                
-                JOptionPane.showMessageDialog(parent,
-                    "Поставка успешно перенесена на склад!",
-                    "Успех",
-                    JOptionPane.INFORMATION_MESSAGE);
-
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(parent,
-                    "Ошибка: " + ex.getMessage(),
-                    "Ошибка",
-                    JOptionPane.ERROR_MESSAGE);
-            }
+        } catch (Exception ex) {
+            ex.printStackTrace(); // <-- добавь
+            JOptionPane.showMessageDialog(parent,
+                "Ошибка обработки поставки: " + ex.getMessage(),
+                "Ошибка",
+                JOptionPane.ERROR_MESSAGE);
         }
     }
+}
+   
 
     // Кастомный рендерер для отображения статуса
     private static class SupplyListRenderer extends DefaultListCellRenderer {

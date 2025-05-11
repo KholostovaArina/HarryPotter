@@ -25,8 +25,8 @@ public class StickCreation {
 
         // Создаем GUI
         JFrame frame = new JFrame("Создание волшебной палочки");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 300);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setSize(500, 300);
         frame.setLayout(null);
         frame.setLocationRelativeTo(null);
 
@@ -75,13 +75,13 @@ public class StickCreation {
         // Расположение элементов
         JLabel labelBody = new JLabel("Выберите корпус:");
         labelBody.setBounds(10, 40, 150, 25);
-        bodyComboBox.setBounds(170, 40, 200, 25);
+        bodyComboBox.setBounds(270, 40, 200, 25);
 
         JLabel labelCore = new JLabel("Выберите сердцевину:");
-        labelCore.setBounds(10, 100, 150, 25);
-        coreComboBox.setBounds(170, 100, 200, 25);
+        labelCore.setBounds(10, 100, 250, 25);
+        coreComboBox.setBounds(270, 100, 200, 25);
 
-        okButton.setBounds(100, 200, 200, 40);
+        okButton.setBounds(150, 200, 200, 40);
 
         // Добавление компонентов
         frame.add(labelBody);
@@ -89,7 +89,8 @@ public class StickCreation {
         frame.add(labelCore);
         frame.add(coreComboBox);
         frame.add(okButton);
-
+ 
+        BeautyUtils.setFontForAllComponents(frame);
         frame.setVisible(true);
     }
 }

@@ -41,6 +41,8 @@ public class ReadyWandsWindow {
         table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
 
         frame.add(scrollPane);
+        BeautyUtils.setFontForAllComponents(scrollPane);
+        table.setEnabled(false);
         frame.setVisible(true);
     }
 }

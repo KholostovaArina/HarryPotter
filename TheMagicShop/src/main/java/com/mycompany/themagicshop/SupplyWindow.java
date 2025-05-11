@@ -8,14 +8,15 @@ import java.util.stream.Collectors;
 public class SupplyWindow {
     public static void create() {
         List<Supply> supplies = Storage.getAllSupplies();
-        System.out.println(supplies.getFirst().getDate());
+        JTextArea textArea = new JTextArea();
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
         List<Warehouse> warehouseItems = Storage.getWarehouse();
 
         System.out.println(warehouseItems.getFirst().getName());
         String[] columns = {"ID","Дата поставки", "Обработано", "Состав поставки"};
         Object[][] data = new Object[supplies.size()][4];
         
-        System.out.println(supplies.size());
         
         for(int i = 0; i < supplies.size(); i++) {
             Supply supply = supplies.get(i);
@@ -32,6 +33,7 @@ public class SupplyWindow {
             data[i][1] = supply.getDate();
             data[i][2] = supply.getInWarehouse() ? "Да" : "Нет";
             data[i][3] = components.isEmpty() ? "Нет данных" : components;
+            
         }
 
         JFrame frame = new JFrame("Список поставок");
@@ -42,11 +44,15 @@ public class SupplyWindow {
         table.setAutoCreateRowSorter(true);
         
         // Настройка отображения
-        table.getColumnModel().getColumn(3).setPreferredWidth(400);
+        table.getColumnModel().getColumn(3).setPreferredWidth(450);
         JScrollPane scrollPane = new JScrollPane(table);
         
         frame.add(scrollPane);
         frame.setLocationRelativeTo(null);
+        BeautyUtils.setFontForAllComponents(scrollPane);
+        BeautyUtils.wrapTable(table, 3);
+        table.setEnabled(false);
+        
         frame.setVisible(true);
     }
 }

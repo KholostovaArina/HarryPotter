@@ -40,9 +40,14 @@ public class PurchaseHistoryWindow {
         for(int i = 0; i < table.getColumnCount(); i++) {
             table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
         }
+        table.getColumnModel().getColumn(0).setPreferredWidth(220);
 
         frame.add(scrollPane);
         frame.setLocationRelativeTo(null);
+        
+        BeautyUtils.setFontForAllComponents(scrollPane);
+        table.setEnabled(false);
+        
         frame.setVisible(true);
     }
 }

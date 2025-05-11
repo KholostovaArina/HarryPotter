@@ -55,10 +55,13 @@ public class AddSupplyWindow {
 
         frame.add(inputPanel, BorderLayout.CENTER);
         frame.add(buttonPanel, BorderLayout.SOUTH);
+        BeautyUtils.setFontForAllComponents(frame);
         frame.setVisible(true);
     }
 
-    private void addComponent() {
+    private List<Warehouse> tempComponents = new ArrayList<>();
+
+private void addComponent() {
     String type = (String) typeCombo.getSelectedItem();
     String name = nameField.getText().trim();
     int quantity = (Integer) quantitySpinner.getValue();
@@ -73,22 +76,25 @@ public class AddSupplyWindow {
         if (currentSupplyId == -1) {
             Supply supply = new Supply(0, LocalDate.parse(dateField.getText()), false);
             currentSupplyId = Storage.addSupplyAndGetId(supply);
-            System.out.println("Создана поставка #" + currentSupplyId);
         }
 
-        // Добавляем компонент в БД
-        Storage.addToWarehouse(type, name, quantity, currentSupplyId);
-        
-        // Обновляем список компонентов
+        // Сохраняем компонент во временный список
+        tempComponents.add(new Warehouse(
+                0, // id будет присвоен БД
+                type,
+                name,
+                quantity,
+                currentSupplyId
+        ));
+
+        // Обновляем отображение списка
         componentsList.add(String.format("%s: %s (%d шт)", type, name, quantity));
-        System.out.println("Добавлен компонент: " + componentsList.getLast());
 
         // Очищаем поля
         nameField.setText("");
         quantitySpinner.setValue(1);
-
     } catch (Exception ex) {
-        showError("Ошибка добавления: " + ex.getMessage());
+        showError("Ошибка добавления компонента: " + ex.getMessage());
         ex.printStackTrace();
     }
 }
@@ -100,6 +106,12 @@ private void saveSupply() {
     }
 
     try {
+        // Сохраняем компоненты в warehouse
+        for (Warehouse component : tempComponents) {
+            Storage.addToWarehouse(component.getType(), component.getName(),
+                                   component.getQuantity(), component.getIdSupply());
+        }
+
         // Обновляем статус поставки
         Supply supply = new Supply(
             currentSupplyId,
@@ -110,13 +122,13 @@ private void saveSupply() {
 
         // Показываем результат
         showSuccess();
-
     } catch (Exception ex) {
         showError("Ошибка сохранения: " + ex.getMessage());
     } finally {
         resetState();
     }
 }
+
 
 private void showError(String message) {
     JOptionPane.showMessageDialog(frame, message, "Ошибка", JOptionPane.ERROR_MESSAGE);
