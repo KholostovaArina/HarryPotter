@@ -25,11 +25,11 @@ public class BeautyUtils {
     }
     
     static {
-        try (InputStream fontStream = BeautyUtils.class.getResourceAsStream("/font.ttf")) {
+        try (InputStream fontStream = BeautyUtils.class.getResourceAsStream("/font.otf")) {
             miniFont = Font.createFont(Font.TRUETYPE_FONT, fontStream);
             miniFont = miniFont.deriveFont(16f);
         } catch (IOException | FontFormatException e) {
-            miniFont = new Font("Serif", Font.PLAIN, 22);
+            miniFont = new Font("Serif", Font.PLAIN, 16);
         }
     }
     
@@ -44,13 +44,13 @@ public class BeautyUtils {
     
     static {
         try {
-            warehouseImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/склад.PNG"));
-            wandImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/палочка.PNG"));
+            warehouseImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/склад.png"));
+            wandImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/палочка.png"));
             skyImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/небо.jpg"));
             createImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/фото1.jpg"));
             buyImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/фото2.jpg"));
             welcomeImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/вход.png"));
-            boxImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/поставка.PNG"));
+            boxImage = ImageIO.read(BeautyUtils.class.getResourceAsStream("/поставка.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
