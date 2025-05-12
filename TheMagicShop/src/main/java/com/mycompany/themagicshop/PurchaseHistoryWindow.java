@@ -6,12 +6,10 @@ import java.util.List;
 
 public class PurchaseHistoryWindow {
     public static void create() {
-        // Получаем данные из БД
         List<MagicWand> soldWands = Storage.getAllWands().stream()
                 .filter(w -> "продана".equals(w.getStatus()))
                 .toList();
 
-        // Создаем модель таблицы
         String[] columns = {"Палочка (сердцевина+корпус)", "Покупатель", "Дата продажи"};
         Object[][] data = new Object[soldWands.size()][3];
         

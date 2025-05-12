@@ -15,18 +15,9 @@ public class Warehouse {
         this.idSupply = idSupply;
     }
 
-    // Геттеры
     public int getId() { return id; }
     public String getType() { return type; }
     public String getName() { return name; }
     public int getQuantity() { return quantity; }
     public int getIdSupply() { return idSupply; }
-
-    @Override
-    public String toString() {
-        return String.format(
-            "Warehouse [id=%d, type=%s, name=%s, quantity=%d, supplyId=%d]",
-            id, type, name, quantity, idSupply
-        );
-    }
 }

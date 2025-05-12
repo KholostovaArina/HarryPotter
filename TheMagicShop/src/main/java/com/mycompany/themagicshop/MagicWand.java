@@ -31,12 +31,4 @@ public class MagicWand {
     public void setStatus(String status) { this.status = status; }
     public void setOwnerName(String ownerName) { this.ownerName = ownerName; }
     public void setPurchaseDate(LocalDate purchaseDate) { this.purchaseDate = purchaseDate; }
-
-    @Override
-    public String toString() {
-        return String.format(
-            "MagicWand [id=%d, corpus=%s, core=%s, status=%s, owner=%s, purchaseDate=%s]",
-            id, corpus, core, status, ownerName, purchaseDate
-        );
-    }
 }

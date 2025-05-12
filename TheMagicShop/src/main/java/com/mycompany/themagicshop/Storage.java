@@ -62,7 +62,6 @@ public class Storage {
         }
     }
 
-    
     public static List<MagicWand> getAllWands() {
         List<MagicWand> wands = new ArrayList<>();
         String sql = "SELECT * FROM magic_shop.magic_wand";
@@ -99,13 +98,11 @@ public class Storage {
         return wands;
     }
 
-    
     public static List<Warehouse> getWarehouse() {
         List<Warehouse> warehouseItems = new ArrayList<>();
         String sql = "SELECT * FROM magic_shop.warehouse";
 
-        try (Connection conn = PostgresConnecter.getConnection(); Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
+        try (Connection conn = PostgresConnecter.getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
                 Warehouse item = new Warehouse(
@@ -260,47 +257,44 @@ public class Storage {
 
     }
 
-
     public static void addSupplyComponent(int supplyId, String type, String name, int quantity) {
-    try (Connection conn = PostgresConnecter.getConnection()) {
-        String sql = "INSERT INTO supply_components (supply_id, type, name, quantity) VALUES (?, ?, ?, ?)";
-        PreparedStatement stmt = conn.prepareStatement(sql);
-        stmt.setInt(1, supplyId);
-        stmt.setString(2, type);
-        stmt.setString(3, name);
-        stmt.setInt(4, quantity);
-        stmt.executeUpdate();
-    } catch (SQLException ex) {
-        throw new RuntimeException("Ошибка добавления компонента поставки", ex);
-    }
-}
-
-public static void moveSupplyToWarehouse(int supplyId) {
-    String checkQuery = "SELECT in_warehouse FROM magic_shop.supply WHERE id = ?";
-    String updateQuery = "UPDATE magic_shop.supply SET in_warehouse = true WHERE id = ?";
-
-    try (Connection conn = PostgresConnecter.getConnection();
-         PreparedStatement checkStmt = conn.prepareStatement(checkQuery);
-         PreparedStatement updateStmt = conn.prepareStatement(updateQuery)) {
-
-        // Проверка, если уже на складе
-        checkStmt.setInt(1, supplyId);
-        ResultSet rs = checkStmt.executeQuery();
-        if (rs.next()) {
-            boolean inWarehouse = rs.getString("in_warehouse").equals("да");
-            if (inWarehouse) {
-                throw new RuntimeException("Поставка уже находится на складе.");
-            }
-        } else {
-            throw new RuntimeException("Поставка с ID " + supplyId + " не найдена.");
+        try (Connection conn = PostgresConnecter.getConnection()) {
+            String sql = "INSERT INTO supply_components (supply_id, type, name, quantity) VALUES (?, ?, ?, ?)";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setInt(1, supplyId);
+            stmt.setString(2, type);
+            stmt.setString(3, name);
+            stmt.setInt(4, quantity);
+            stmt.executeUpdate();
+        } catch (SQLException ex) {
+            throw new RuntimeException("Ошибка добавления компонента поставки", ex);
         }
-
-        // Обновление поля in_warehouse
-        updateStmt.setInt(1, supplyId);
-        updateStmt.executeUpdate();
-
-    } catch (SQLException ex) {
-        throw new RuntimeException("Ошибка при переносе поставки на склад: " + ex.getMessage(), ex);
     }
-}
+
+    public static void moveSupplyToWarehouse(int supplyId) {
+        String checkQuery = "SELECT in_warehouse FROM magic_shop.supply WHERE id = ?";
+        String updateQuery = "UPDATE magic_shop.supply SET in_warehouse = true WHERE id = ?";
+
+        try (Connection conn = PostgresConnecter.getConnection(); PreparedStatement checkStmt = conn.prepareStatement(checkQuery); PreparedStatement updateStmt = conn.prepareStatement(updateQuery)) {
+
+            // Проверка, если уже на складе
+            checkStmt.setInt(1, supplyId);
+            ResultSet rs = checkStmt.executeQuery();
+            if (rs.next()) {
+                boolean inWarehouse = rs.getString("in_warehouse").equals("да");
+                if (inWarehouse) {
+                    throw new RuntimeException("Поставка уже находится на складе.");
+                }
+            } else {
+                throw new RuntimeException("Поставка с ID " + supplyId + " не найдена.");
+            }
+
+            // Обновление поля in_warehouse
+            updateStmt.setInt(1, supplyId);
+            updateStmt.executeUpdate();
+
+        } catch (SQLException ex) {
+            throw new RuntimeException("Ошибка при переносе поставки на склад: " + ex.getMessage(), ex);
+        }
+    }
 }
