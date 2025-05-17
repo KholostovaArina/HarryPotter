@@ -13,16 +13,13 @@ public class ProcessSupplyWindow {
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setLayout(new BorderLayout());
 
-        // Получаем все поставки
         List<Supply> supplies = Storage.getAllSupplies();
         DefaultListModel<Supply> listModel = new DefaultListModel<>();
         supplies.forEach(listModel::addElement);
 
-        // Создаем список с рендерером
         JList<Supply> list = new JList<>(listModel);
         list.setCellRenderer(new SupplyListRenderer());
 
-        // Добавляем обработчик двойного клика
         list.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent evt) {
@@ -56,7 +53,6 @@ public class ProcessSupplyWindow {
 
         if (confirm == JOptionPane.YES_OPTION) {
             try {
-                // Получаем компоненты из временного хранилища
                 List<Warehouse> components = AddSupplyWindow.AddSupplyStorage.getComponents(supply.getId());
                 System.out.println("Компоненты для добавления на склад: " + components);
 
@@ -64,7 +60,6 @@ public class ProcessSupplyWindow {
                     throw new RuntimeException("Нет компонентов для этой поставки.");
                 }
 
-                // Переносим в warehouse
                 for (Warehouse component : components) {
                     Storage.addToWarehouse(
                         component.getType(),
@@ -74,21 +69,17 @@ public class ProcessSupplyWindow {
                     );
                 }
 
-                // Обновляем статус поставки
                 supply.setInWarehouse(true);
                 Storage.updateSupply(supply);
                 model.setElementAt(supply, model.indexOf(supply));
 
-                // Очищаем временное хранилище только после успеха
                 AddSupplyWindow.AddSupplyStorage.clearComponents(supply.getId());
 
-                // Закрываем и сбрасываем окно AddSupplyWindow, если оно было открыто
                 if (AddSupplyWindow.isOpen()) {
                     AddSupplyWindow window = AddSupplyWindow.getInstance();
                     window.closeAndReset();
                 }
 
-                // Обновляем интерфейс SupplyWindow
                 SwingUtilities.invokeLater(() -> {
                     SupplyWindow.create();
                 });

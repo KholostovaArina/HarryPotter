@@ -15,12 +15,11 @@ public class AddSupplyWindow {
     private JTextField dateField;
     private JComboBox<String> typeCombo;
 
-    // Для отслеживания открытого окна
     private static boolean isOpen = false;
     private static AddSupplyWindow instance;
 
     public static void create() {
-        if (isOpen) return; // Не открываем второе окно
+        //if (isOpen) return; // Не открываем второе окно
         new AddSupplyWindow().initializeUI();
     }
 
@@ -41,8 +40,7 @@ public class AddSupplyWindow {
         frame.setLayout(new BorderLayout(10, 10));
         frame.setLocationRelativeTo(null);
 
-        // Панель ввода данных
-        JPanel panel = BeautyUtils.createPanelWithPhoto(BeautyUtils.getBuyImage());
+        //JPanel panel = BeautyUtils.createPanelWithPhoto(BeautyUtils.getBuyImage());
         JPanel inputPanel = new JPanel(new GridLayout(4, 2, 10, 10));
         inputPanel.setOpaque(false);
         typeCombo = new JComboBox<>(new String[]{"корпус", "сердцевина"});
@@ -59,7 +57,6 @@ public class AddSupplyWindow {
         inputPanel.add(new JLabel("Дата:"));
         inputPanel.add(dateField);
 
-        // Панель кнопок
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 10));
         JButton addButton = new JButton("Добавить компонент");
         JButton saveButton = new JButton("Поставка закончена");
@@ -91,13 +88,11 @@ public class AddSupplyWindow {
         }
 
         try {
-            // Создаем поставку при первом добавлении компонента
             if (currentSupplyId == -1) {
                 Supply supply = new Supply(0, LocalDate.parse(dateField.getText()), false);
                 currentSupplyId = Storage.addSupplyAndGetId(supply);
             }
 
-            // Сохраняем компонент во временный список
             tempComponents.add(new Warehouse(
                     0,
                     type,
@@ -119,7 +114,6 @@ public class AddSupplyWindow {
         }
 
         try {
-            // Сохраняем компоненты во временное хранилище
             AddSupplyStorage.addComponents(currentSupplyId, tempComponents);
             showSuccess();
         } catch (Exception ex) {
@@ -158,7 +152,6 @@ public class AddSupplyWindow {
         frame.dispose();
     }
 
-    // Временное хранилище для компонентов поставок
     public static class AddSupplyStorage {
         private static final java.util.Map<Integer, List<Warehouse>> supplyComponents = new java.util.HashMap<>();
 

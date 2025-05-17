@@ -7,35 +7,27 @@ import java.util.stream.Collectors;
 
 public class StickCreation {
     public static void create() {
-        // Создаем основную панель с фоновым изображением
         JPanel mainPanel = BeautyUtils.createPanelWithPhoto(BeautyUtils.getCreateImage());
         mainPanel.setLayout(null);
 
-        // Получаем данные со склада
         List<Warehouse> warehouseItems = Storage.getWarehouse();
 
-        // Фильтруем компоненты по типам
         List<String> bodies = filterWarehouseItems(warehouseItems, "корпус");
         List<String> cores = filterWarehouseItems(warehouseItems, "сердцевина");
 
-        // Проверяем наличие компонентов
         if (bodies.isEmpty() || cores.isEmpty()) {
             showMaterialError();
             return;
         }
 
-        // Создаем и настраиваем фрейм
         JFrame frame = createFrame();
         
-        // Создаем компоненты интерфейса
         JComboBox<String> bodyComboBox = new JComboBox<>(bodies.toArray(new String[0]));
         JComboBox<String> coreComboBox = new JComboBox<>(cores.toArray(new String[0]));
         JButton createButton = createButton(frame, bodyComboBox, coreComboBox);
 
-        // Настраиваем расположение компонентов
         setupComponents(mainPanel, bodyComboBox, coreComboBox, createButton);
 
-        // Добавляем панель во фрейм и отображаем
         frame.add(mainPanel);
         BeautyUtils.setFontForAllComponents(frame);
         frame.setVisible(true);

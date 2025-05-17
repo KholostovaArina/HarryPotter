@@ -7,8 +7,7 @@ import java.util.List;
 public class PurchaseHistoryWindow {
     public static void create() {
         List<MagicWand> soldWands = Storage.getAllWands().stream()
-                .filter(w -> "продана".equals(w.getStatus()))
-                .toList();
+                .filter(w -> "продана".equals(w.getStatus())).toList();
 
         String[] columns = {"Палочка (сердцевина+корпус)", "Покупатель", "Дата продажи"};
         Object[][] data = new Object[soldWands.size()][3];
@@ -20,7 +19,6 @@ public class PurchaseHistoryWindow {
             data[i][2] = wand.getPurchaseDate();
         }
 
-        // Создаем GUI
         JFrame frame = new JFrame("История заказов");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(600, 400);
@@ -28,11 +26,9 @@ public class PurchaseHistoryWindow {
         JTable table = new JTable(new DefaultTableModel(data, columns));
         table.setFillsViewportHeight(true);
         
-        // Настройка отображения
         JScrollPane scrollPane = new JScrollPane(table);
         table.setAutoCreateRowSorter(true);
         
-        // Центрирование данных
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         for(int i = 0; i < table.getColumnCount(); i++) {
@@ -45,7 +41,6 @@ public class PurchaseHistoryWindow {
         
         BeautyUtils.setFontForAllComponents(scrollPane);
         table.setEnabled(false);
-        
         frame.setVisible(true);
     }
 }

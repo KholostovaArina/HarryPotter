@@ -69,13 +69,11 @@ public class Storage {
         try (Connection conn = PostgresConnecter.getConnection(); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                // Обработка NULL для name_owner
                 String ownerName = rs.getString("name_owner");
                 if (rs.wasNull()) {
                     ownerName = null;
                 }
 
-                // Обработка NULL для date_of_purchase
                 LocalDate purchaseDate = null;
                 Date date = rs.getDate("date_of_purchase");
                 if (date != null) {
@@ -277,7 +275,6 @@ public class Storage {
 
         try (Connection conn = PostgresConnecter.getConnection(); PreparedStatement checkStmt = conn.prepareStatement(checkQuery); PreparedStatement updateStmt = conn.prepareStatement(updateQuery)) {
 
-            // Проверка, если уже на складе
             checkStmt.setInt(1, supplyId);
             ResultSet rs = checkStmt.executeQuery();
             if (rs.next()) {
@@ -289,7 +286,6 @@ public class Storage {
                 throw new RuntimeException("Поставка с ID " + supplyId + " не найдена.");
             }
 
-            // Обновление поля in_warehouse
             updateStmt.setInt(1, supplyId);
             updateStmt.executeUpdate();
 
